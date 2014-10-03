@@ -16,7 +16,7 @@ class TestDataYamlFixture extends YamlFixture {
 		// import is complete.
 		$validationenabled = DataObject::get_validation_enabled();
 		DataObject::set_validation_enabled(false);
-		
+
 		$parser = new Spyc();
 		$fixtureContent = $parser->loadFile($this->fixtureFile);
 
@@ -35,7 +35,7 @@ class TestDataYamlFixture extends YamlFixture {
 				$this->writeRelations($dataClass, $items);
 			}
 		}
-		
+
 		DataObject::set_validation_enabled($validationenabled);
 	}
 
@@ -91,10 +91,10 @@ class TestDataYamlFixture extends YamlFixture {
 	 * from the testdata directory if found.
 	 */
 	protected function writeDataObject($model, $dataClass, $items) {
-		File::$update_filesystem = false;
+//		File::$update_filesystem = false;
 
 		if (Director::isLive()) user_error('This should not be run on the live site.', E_USER_ERROR);
-		
+
 		$testDataTag = basename($this->fixtureFile);
 		foreach($items as $identifier => $fields) {
 			$tag = $this->getTag($testDataTag, $dataClass, $identifier);
@@ -112,7 +112,7 @@ class TestDataYamlFixture extends YamlFixture {
 				}
 				$obj = $model->$dataClass->newObject();
 			}
-			
+
 			// If an ID is explicitly passed, then we'll sort out the initial write straight away
 			// This is just in case field setters triggered by the population code in the next block
 			// Call $this->write().  (For example, in FileTest)
@@ -126,9 +126,10 @@ class TestDataYamlFixture extends YamlFixture {
 				$obj->write(false, true);
 				if(method_exists($conn, 'allowPrimaryKeyEditing')) $conn->allowPrimaryKeyEditing(ClassInfo::baseDataClass($dataClass), false);
 			}
-			
+
 			// Populate the dictionary with the ID
 			if(!is_array($fields)) {
+                                continue;
 				throw new Exception($dataClass . ' failed to load. Please check YML file for errors');
 			}
 
@@ -142,7 +143,7 @@ class TestDataYamlFixture extends YamlFixture {
 			// when creating a Folder record, the directory should exist
 			if(is_a($obj, 'Folder')) {
 				if(!file_exists($obj->FullPath)) mkdir($obj->FullPath);
-				chmod($obj->FullPath, Filesystem::$file_create_mask);
+//				chmod($obj->FullPath, Filesystem::$file_create_mask);
 			}
 
 			// when creating a File record, the file should exist
@@ -159,12 +160,12 @@ class TestDataYamlFixture extends YamlFixture {
 				$result = glob(sprintf(BASE_PATH . '/*/testdata/files/%s', $obj->Name));
 				if($result) file_put_contents($obj->FullPath, file_get_contents($result[0]));
 
-				chmod($obj->FullPath, Filesystem::$file_create_mask);
+//				chmod($obj->FullPath, Filesystem::$file_create_mask);
 			}
 
 			// has to happen before relations in case a class is referring to itself
 			$this->fixtureDictionary[$dataClass][$identifier] = $obj->ID;
-			
+
 			TestDataYamlFixture::attempt_publish($obj);
 
 			// Increment the version on the tag so we can find the old unused records afterwards.
@@ -204,7 +205,7 @@ class TestDataYamlFixture extends YamlFixture {
 				Controller::curr()->message("<br>(Could not find $dataClass::$identifier for relation updates, skipping)");
 				continue;
 			}
-			
+
 			// Populate all relations
 			if($fields) foreach($fields as $fieldName => $fieldVal) {
 				if($obj->many_many($fieldName) || $obj->has_many($fieldName)) {
@@ -238,7 +239,7 @@ class TestDataYamlFixture extends YamlFixture {
 		// Parse a dictionary reference - used to set foreign keys
 		if(substr($fieldVal,0,2) == '=>') {
 			list($a, $b) = explode('.', substr($fieldVal,2), 2);
-			return $this->fixtureDictionary[$a][$b];
+			return isset($this->fixtureDictionary[$a][$b]) ? $this->fixtureDictionary[$a][$b] : "";
 
 			// Regular field value setting
 		} else {

@@ -3,6 +3,10 @@
 class TestDataController extends Controller {
 	static $data_dir;
 	static $quiet = false;
+        static $allowed_actions = array(
+		'index',
+		'load'
+	);
 
 	static function get_data_dir() {
 		if (isset(self::$data_dir)) return self::$data_dir;
@@ -28,7 +32,7 @@ The available commands are:
    load      Loads the data from yml files. The new records will be created, old removed and the
              existing ones updated. Added db objects are tracked, so it is possible to remove all
              of them later. The following COMMANDs are accepted:
-            
+
                all
                   Scans the <wwwroot>/<project>/testdata directory for all available files and loads
                   them into the database
@@ -53,7 +57,7 @@ The available commands are:
 			echo $message;
 		}
 	}
-	
+
 	/**
 	 * Remove all data created by testdata - i.e. all rows referenced from the TestDataTag table.
 	 */
@@ -104,7 +108,7 @@ The available commands are:
 		foreach ($files as $file) {
 			// Checking the validity of the file
 			if (strpos($file, '.yml')===false || $file[0]=='.' || !is_file(BASE_PATH."/".self::get_data_dir()."/".$file)) continue;
-			
+
 			// Check if the file was requested
 			$fileBase = str_replace('.yml', '', $file);
 			if ($requestedFiles && !in_array(strtolower($fileBase), $requestedFiles)) {
@@ -141,6 +145,6 @@ The available commands are:
 
 		$this->message("<span style=\"background: green; color: white;\">SUCCESS</span>\n");
 	}
-	
+
 }
 
