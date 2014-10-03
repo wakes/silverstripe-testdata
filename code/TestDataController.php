@@ -3,7 +3,7 @@
 class TestDataController extends Controller {
 	static $data_dir;
 	static $quiet = false;
-        static $allowed_actions = array(
+        private static $allowed_actions = array(
 		'index',
 		'load'
 	);
@@ -16,7 +16,12 @@ class TestDataController extends Controller {
 	function init() {
 		parent::init();
 
-		$canAccess = ((Director::isDev() || Director::is_cli()) && Permission::check("ADMIN"));
+                $canAccess = (
+			Director::isDev()
+			|| Director::is_cli()
+			// Its important that we don't run this check if dev/build was requested
+			|| Permission::check("ADMIN")
+		);
 		if(!$canAccess) return Security::permissionFailure($this);
 
 		$this->message("<h1>Test Data</h1>");

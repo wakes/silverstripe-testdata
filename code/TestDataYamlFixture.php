@@ -91,7 +91,7 @@ class TestDataYamlFixture extends YamlFixture {
 	 * from the testdata directory if found.
 	 */
 	protected function writeDataObject($model, $dataClass, $items) {
-//		File::$update_filesystem = false;
+		Config::inst()->update('File', 'update_filesystem', false);
 
 		if (Director::isLive()) user_error('This should not be run on the live site.', E_USER_ERROR);
 
@@ -143,8 +143,8 @@ class TestDataYamlFixture extends YamlFixture {
 			// when creating a Folder record, the directory should exist
 			if(is_a($obj, 'Folder')) {
 				if(!file_exists($obj->FullPath)) mkdir($obj->FullPath);
-//				chmod($obj->FullPath, Filesystem::$file_create_mask);
-			}
+				chmod($obj->FullPath, Filesystem::config()->folder_create_mask);
+                	}
 
 			// when creating a File record, the file should exist
 			if(is_a($obj, 'File')) {
@@ -160,7 +160,7 @@ class TestDataYamlFixture extends YamlFixture {
 				$result = glob(sprintf(BASE_PATH . '/*/testdata/files/%s', $obj->Name));
 				if($result) file_put_contents($obj->FullPath, file_get_contents($result[0]));
 
-//				chmod($obj->FullPath, Filesystem::$file_create_mask);
+                                chmod($obj->FullPath, Filesystem::config()->file_create_mask);
 			}
 
 			// has to happen before relations in case a class is referring to itself
