@@ -1,5 +1,5 @@
 {
-	"name": "silverstripe/testdata",
+	"name": "wakes/silverstripe-testdata",
 	"description": "Manage test data with Yaml files",
 	"type": "silverstripe-module",
 	"keywords": ["silverstripe"],
@@ -8,6 +8,10 @@
 		{
 			"name": "Mateusz Uzdowski",
 			"email": "mateusz@silverstripe.com"
+		},
+		{
+			"name": "Steve Wake"
+			"email": "wakes@github.com"
 		}
 	],
 	"require":
